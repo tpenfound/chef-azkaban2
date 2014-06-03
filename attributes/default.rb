@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # Install
-default[:azkaban][:version] = "2.1"
+default[:azkaban][:version] = "2.5"
 default[:azkaban][:install_dir] = "/usr/local"
 default[:azkaban][:user] = "azkaban"
 default[:azkaban][:group] = "azkaban"
