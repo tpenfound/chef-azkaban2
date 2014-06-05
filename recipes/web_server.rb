@@ -24,7 +24,7 @@ install_dir = "#{node[:azkaban][:install_dir]}/webserver"
 version = node[:azkaban][:version]
 fqdn = node[:fqdn].dup # use this as the assumed mysql host
 
-ws_dir = "azkaban-#{version}"
+ws_dir = "azkaban-web-#{version}"
 tarball = "azkaban-web-server-#{version}.tar.gz"
 download_file = "https://s3.amazonaws.com/azkaban2/azkaban2/#{version}/#{tarball}"
 

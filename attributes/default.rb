@@ -16,8 +16,8 @@
 # limitations under the License.
 
 # Install
-default[:azkaban][:version] = "2.5"
-default[:azkaban][:install_dir] = "/usr/local"
+default[:azkaban][:version] = "2.5.0"
+default[:azkaban][:install_dir] = "/opt"
 default[:azkaban][:user] = "azkaban"
 default[:azkaban][:group] = "azkaban"
 default[:azkaban][:jdbc_jar_url] = ""
