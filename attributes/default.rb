@@ -32,6 +32,8 @@ default[:azkaban][:name] = "Local"
 default[:azkaban][:label] = "My Local Azkaban"
 default[:azkaban][:color] = "#FF3601"
 default[:azkaban][:user_manager][:class] = "azkaban.user.XmlUserManager"
+default[:azkaban][:timezone] = "America/Chicago"
+
 
 # talk to MySQL
 default[:azkaban][:mysql][:database] = "azkaban"

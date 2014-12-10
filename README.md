@@ -3,7 +3,7 @@ Description
 
 Installs Azkaban2. http://azkaban.github.io/azkaban2/
 
-NB this cookbook is meant for use with ironfan.
+Derived from Yieldbot's azkaban2 cookbook (https://github.com/yieldbot/chef-azkaban2) but set up to install Azkaban 2.5 instead of 2.0, set some things for my particular environment (notably, eschew Ironfan), parameterize a few things so I can override them in wrapper cookbooks.
 
 Requirements
 ============
