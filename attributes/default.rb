@@ -34,6 +34,9 @@ default[:azkaban][:color] = "#FF3601"
 default[:azkaban][:user_manager][:class] = "azkaban.user.XmlUserManager"
 default[:azkaban][:timezone] = "America/Chicago"
 
+default[:azkaban][:execution_dir]="executions"
+default[:azkaban][:project_dir]="projects"
+
 
 # talk to MySQL
 default[:azkaban][:mysql][:database] = "azkaban"

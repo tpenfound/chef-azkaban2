@@ -11,7 +11,8 @@ user.manager.xml.file=conf/azkaban-users.xml
 
 #Loader for projects
 executor.global.properties=conf/global.properties
-azkaban.project.dir=projects
+azkaban.execution.dir=<%= @node[:azkaban][:execution_dir] %>
+azkaban.project.dir=<%= @node[:azkaban][:project_dir] %>
 
 database.type=mysql
 mysql.port=3306
