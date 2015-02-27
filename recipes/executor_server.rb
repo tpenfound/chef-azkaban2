@@ -28,6 +28,9 @@ ws_dir = "azkaban-executor-#{version}"
 tarball = "azkaban-executor-server-#{version}.tar.gz"
 download_file = "https://s3.amazonaws.com/azkaban2/azkaban2/#{version}/#{tarball}"
 
+jobtype_plugin_tarball = "/azkaban-jobtype-#{version}.tar.gz"
+jobtype_plugin_download = "https://s3.amazonaws.com/azkaban2/azkaban-plugins/#{version}/azkaban-jobtype-#{version}.tar.gz"
+
 # create user
 group group do
 end
@@ -98,11 +101,26 @@ directory "#{install_dir}/#{ws_dir}/plugins/jobtypes" do
   action :create
 end
 
-# start process
-execute "start executor" do
-  user user
-  group group
-  cwd "#{install_dir}/#{ws_dir}"
-  command "bin/azkaban-executor-start.sh &> executor.out"
-  action :run
+# # start process
+# execute "start executor" do
+#   user user
+#   group group
+#   cwd "#{install_dir}/#{ws_dir}"
+#   command "bin/azkaban-executor-start.sh &> executor.out"
+#   action :run
+# end
+
+if node[:azkaban][:include_jobtype_plugin]
+  # download and unpack tar
+  remote_file "#{Chef::Config[:file_cache_path]}/#{jobtype_plugin_tarball}" do
+    source jobtype_plugin_download
+    mode 00644
+  end
+
+  execute "tar" do
+    user  user
+    group group
+    cwd "#{install_dir}/#{ws_dir}/plugins"
+    command "tar zxvf #{Chef::Config[:file_cache_path]}/#{jobtype_plugin_tarball}"
+  end
 end

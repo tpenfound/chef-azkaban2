@@ -89,12 +89,21 @@ template "#{install_dir}/#{ws_dir}/conf/azkaban.properties" do
   })
 end
 
-# start process
-execute "start webserver" do
-  user user
+# apparently we need to create this (empty) directory...
+directory "{install_dir}/#{ws_dir}/logs" do
+  owner user
   group group
-  cwd "#{install_dir}/#{ws_dir}"
-  command "bin/azkaban-web-start.sh &> webserver.out"
-  action :run
+  mode 00755
+  recursive true
+  action :create
 end
+
+# # start process
+# execute "start webserver" do
+#   user user
+#   group group
+#   cwd "#{install_dir}/#{ws_dir}"
+#   command "bin/azkaban-web-start.sh &> webserver.out"
+#   action :run
+# end
 

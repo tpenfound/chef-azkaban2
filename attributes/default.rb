@@ -27,6 +27,9 @@ default[:azkaban][:tmp_dir] = "/tmp"
 default[:azkaban][:jetty][:ssl_port] = 8443
 default[:azkaban][:jetty][:max_threads] = 25
 
+# executor-specific
+default[:azkaban][:include_jobtype_plugin] = false
+
 # Azkaban properties
 default[:azkaban][:name] = "Local"
 default[:azkaban][:label] = "My Local Azkaban"
