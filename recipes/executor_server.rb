@@ -30,6 +30,7 @@ download_file = "https://s3.amazonaws.com/azkaban2/azkaban2/#{version}/#{tarball
 
 jobtype_plugin_tarball = "/azkaban-jobtype-#{version}.tar.gz"
 jobtype_plugin_download = "https://s3.amazonaws.com/azkaban2/azkaban-plugins/#{version}/azkaban-jobtype-#{version}.tar.gz"
+jobtype_plugin_ext_dir = "#{install_dir}/#{ws_dir}/plugins/azkaban-jobtype-#{version}"
 
 # create user
 group group do
@@ -92,7 +93,8 @@ template "#{install_dir}/#{ws_dir}/conf/azkaban.properties" do
   })
 end
 
-# apparently we need to create this (empty) directory...
+# apparently we need to create this (empty) directory... 
+# ...which we'll actually use for, strangely enough, the jobtypes plugin
 directory "#{install_dir}/#{ws_dir}/plugins/jobtypes" do
   owner user
   group group
@@ -100,15 +102,6 @@ directory "#{install_dir}/#{ws_dir}/plugins/jobtypes" do
   recursive true
   action :create
 end
-
-# # start process
-# execute "start executor" do
-#   user user
-#   group group
-#   cwd "#{install_dir}/#{ws_dir}"
-#   command "bin/azkaban-executor-start.sh &> executor.out"
-#   action :run
-# end
 
 if node[:azkaban][:include_jobtype_plugin]
   # download and unpack tar
@@ -122,5 +115,37 @@ if node[:azkaban][:include_jobtype_plugin]
     group group
     cwd "#{install_dir}/#{ws_dir}/plugins"
     command "tar zxvf #{Chef::Config[:file_cache_path]}/#{jobtype_plugin_tarball}"
+    not_if { File.exists?('#{node[:azkaban][:install_dir]}/azkaban_misc/.jobtypes_installed') }
+  end
+
+  bash 'do_azkaban_jobtypes_init' do
+    code <<-EOH
+      mv #{jobtype_plugin_ext_dir}/* #{install_dir}/#{ws_dir}/plugins/jobtypes
+      rmdir #{jobtype_plugin_ext_dir}
+      touch #{node[:azkaban][:install_dir]}/azkaban_misc/.jobtypes_installed
+    EOH
+    cwd "#{node[:azkaban][:install_dir]}/azkaban_misc"
+    user "root"
+    not_if { File.exists?('#{node[:azkaban][:install_dir]}/azkaban_misc/.jobtypes_installed') }
+    action :run
+  end
+
+  template "#{install_dir}/#{ws_dir}/plugins/jobtypes/commonprivate.properties" do
+    source "jobtype-commonprivate.properties.erb"
+    owner user
+    group group
+    mode  00755
+    # variables({
+    #     :mysql_host => fqdn
+    # })
   end
 end
+
+# # start process
+# execute "start executor" do
+#   user user
+#   group group
+#   cwd "#{install_dir}/#{ws_dir}"
+#   command "bin/azkaban-executor-start.sh &> executor.out"
+#   action :run
+# end

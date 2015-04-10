@@ -1,6 +1,7 @@
 azkaban_dir=$(dirname $0)/..
 base_dir=$azkaban_dir
 tmpdir=<%= @node[:azkaban][:tmp_dir] %>
+export PATH=/usr/local/bin:$PATH
 
 if [[ -z "$tmpdir" ]]; then
 echo "temp directory must be set!"
