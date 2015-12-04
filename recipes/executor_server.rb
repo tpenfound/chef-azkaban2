@@ -18,9 +18,11 @@
 # == Recipes
 include_recipe "java"
 
-user = node[:azkaban][:user]
-group = node[:azkaban][:group]
-install_dir = "#{node[:azkaban][:install_dir]}/executor"
+user =  node[:azkaban][:executor][:user]
+group = node[:azkaban][:executor][:group]
+
+install_dir = node[:azkaban][:install_dir]
+
 version = node[:azkaban][:version]
 fqdn = node[:fqdn].dup # use this as the assumed mysql host
 
@@ -31,18 +33,6 @@ download_file = "https://s3.amazonaws.com/azkaban2/azkaban2/#{version}/#{tarball
 jobtype_plugin_tarball = "/azkaban-jobtype-#{version}.tar.gz"
 jobtype_plugin_download = "https://s3.amazonaws.com/azkaban2/azkaban-plugins/#{version}/azkaban-jobtype-#{version}.tar.gz"
 jobtype_plugin_ext_dir = "#{install_dir}/#{ws_dir}/plugins/azkaban-jobtype-#{version}"
-
-# create user
-group group do
-end
-
-user user do
-  comment "Azkaban user"
-  gid "azkaban"
-  home "/home/azkaban"
-  shell "/bin/noshell"
-  supports :manage_home => false
-end
 
 # create installation directory
 directory "#{install_dir}" do
@@ -140,12 +130,3 @@ if node[:azkaban][:include_jobtype_plugin]
     # })
   end
 end
-
-# # start process
-# execute "start executor" do
-#   user user
-#   group group
-#   cwd "#{install_dir}/#{ws_dir}"
-#   command "bin/azkaban-executor-start.sh &> executor.out"
-#   action :run
-# end

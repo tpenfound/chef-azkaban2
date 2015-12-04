@@ -18,8 +18,10 @@
 # Install
 default[:azkaban][:version] = "2.5.0"
 default[:azkaban][:install_dir] = "/opt"
-default[:azkaban][:user] = "azkaban"
-default[:azkaban][:group] = "azkaban"
+default[:azkaban][:executor][:user] = "azkaban"
+default[:azkaban][:executor][:group] = "azkaban"
+default[:azkaban][:webserver][:user] = "azkaban"
+default[:azkaban][:webserver][:group] = "azkaban"
 default[:azkaban][:jdbc_jar_url] = ""
 default[:azkaban][:tmp_dir] = "/tmp"
 

@@ -18,27 +18,17 @@
 # == Recipes
 include_recipe "java"
 
-user = node[:azkaban][:user]
-group = node[:azkaban][:group]
-install_dir = "#{node[:azkaban][:install_dir]}/webserver"
+user  = node[:azkaban][:webserver][:user]
+group = node[:azkaban][:webserver][:group]
+
+install_dir = node[:azkaban][:install_dir]
+
 version = node[:azkaban][:version]
 fqdn = node[:fqdn].dup # use this as the assumed mysql host
 
 ws_dir = "azkaban-web-#{version}"
 tarball = "azkaban-web-server-#{version}.tar.gz"
 download_file = "https://s3.amazonaws.com/azkaban2/azkaban2/#{version}/#{tarball}"
-
-# create user
-group group do
-end
-
-user user do
-  comment "Azkaban user"
-  gid "azkaban"
-  home "/home/azkaban"
-  shell "/bin/noshell"
-  supports :manage_home => false
-end
 
 # create installation directory
 directory "#{install_dir}" do
@@ -97,13 +87,3 @@ directory "{install_dir}/#{ws_dir}/logs" do
   recursive true
   action :create
 end
-
-# # start process
-# execute "start webserver" do
-#   user user
-#   group group
-#   cwd "#{install_dir}/#{ws_dir}"
-#   command "bin/azkaban-web-start.sh &> webserver.out"
-#   action :run
-# end
-
