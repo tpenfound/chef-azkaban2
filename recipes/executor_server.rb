@@ -83,6 +83,29 @@ template "#{install_dir}/#{ws_dir}/conf/azkaban.properties" do
   })
 end
 
+template "azkaban-executor-init" do
+    path "/etc/init.d/azkaban-executor"
+    source "azkaban-executor-init-script.sh.erb"
+    owner "root"
+    group "root"
+    mode "0755"
+    notifies :restart, "service[azkaban-executor]"
+end
+
+directory "#{install_dir}/#{ws_dir}/logs" do
+  owner user
+  group group
+  mode 00755
+  recursive true
+  action :create
+end
+
+service "azkaban-executor" do
+    pattern 'azkaban-executor'
+    supports :restart => true, :start => true, :stop => true
+    action [ :nothing ]
+end
+
 # apparently we need to create this (empty) directory... 
 # ...which we'll actually use for, strangely enough, the jobtypes plugin
 directory "#{install_dir}/#{ws_dir}/plugins/jobtypes" do

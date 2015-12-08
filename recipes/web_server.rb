@@ -87,3 +87,26 @@ directory "{install_dir}/#{ws_dir}/logs" do
   recursive true
   action :create
 end
+
+template "azkaban-web-init" do
+    path "/etc/init.d/azkaban-web"
+    source "azkaban-web-init-script.sh.erb"
+    owner "root"
+    group "root"
+    mode "0755"
+    notifies :restart, "service[azkaban-web]"
+end
+
+directory "#{install_dir}/#{ws_dir}/logs" do
+  owner user
+  group group
+  mode 00755
+  recursive true
+  action :create
+end
+
+service "azkaban-web" do
+    pattern 'azkaban-web'
+    supports :restart => true, :start => true, :stop => true
+    action [ :nothing ]
+end
