@@ -65,7 +65,7 @@ start()
   if [ ! -z "$AZKBN_USER" ]; then
      #cd "$AZKBN_HOME" && bin/start-web.sh  &
      $CMD_PREFIX "cd \"$AZKBN_HOME\" && bin/start-web.sh &"
-     echo $! > $AZKBN_PIDFILE
+     #echo $! > $AZKBN_PIDFILE
   fi
 
  # success

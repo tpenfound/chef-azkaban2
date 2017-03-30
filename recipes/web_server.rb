@@ -69,6 +69,13 @@ template "#{install_dir}/#{ws_dir}/bin/azkaban-web-start.sh" do
   mode  00755
 end
 
+template "#{install_dir}/#{ws_dir}/bin/azkaban-web-shutdown.sh" do
+  source "azkaban-web-shutdown.sh.erb"
+  owner user
+  group group
+  mode  00755
+end
+
 template "#{install_dir}/#{ws_dir}/conf/azkaban.properties" do
   source "azkaban.properties.erb"
   owner user
