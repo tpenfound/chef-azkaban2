@@ -25,6 +25,9 @@ default[:azkaban][:webserver][:group] = "azkaban"
 default[:azkaban][:jdbc_jar_url] = ""
 default[:azkaban][:tmp_dir] = "/tmp"
 
+default[:azkaban][:executor][:download_url] = ""
+default[:azkaban][:webserver][:download_url] = ""
+
 # webserver-specific
 default[:azkaban][:jetty][:ssl_port] = 8443
 default[:azkaban][:jetty][:max_threads] = 25

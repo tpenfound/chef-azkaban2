@@ -28,7 +28,9 @@ fqdn = node[:fqdn].dup # use this as the assumed mysql host
 
 ws_dir = "azkaban-executor-#{version}"
 tarball = "azkaban-executor-server-#{version}.tar.gz"
-download_file = "https://s3.amazonaws.com/azkaban2/azkaban2/#{version}/#{tarball}"
+
+node.set[:azkaban][:executor][:download_url] = "https://s3.amazonaws.com/azkaban2/azkaban2/#{version}/#{tarball}"
+download_file = node[:azkaban][:executor][:download_url]
 
 jobtype_plugin_tarball = "/azkaban-jobtype-#{version}.tar.gz"
 jobtype_plugin_download = "https://s3.amazonaws.com/azkaban2/azkaban-plugins/#{version}/azkaban-jobtype-#{version}.tar.gz"
