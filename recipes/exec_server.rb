@@ -1,5 +1,5 @@
 # Cookbook Name:: azkaban2
-# Recipe:: web server
+# Recipe:: executor server
 #
 # Copyright 2013, Yieldbot
 #
@@ -18,18 +18,18 @@
 # == Recipes
 include_recipe "java"
 
-user  = node[:azkaban][:webserver][:user]
-group = node[:azkaban][:webserver][:group]
+user =  node[:azkaban][:executor][:user]
+group = node[:azkaban][:executor][:group]
 
 install_dir = node[:azkaban][:install_dir]
 
 version = node[:azkaban][:version]
 fqdn = node[:fqdn].dup # use this as the assumed mysql host
 
-ws_dir = "azkaban-web-server-#{version}"
-tarball = "azkaban-web-server-#{version}.tar.gz"
+exec_dir = "azkaban-exec-server-#{version}"
+tarball = "azkaban-exec-server-#{version}.tar.gz"
 
-download_file = node[:azkaban][:webserver][:download_url]
+download_file = node[:azkaban][:executor][:download_url]
 
 # create installation directory
 directory "#{install_dir}" do
@@ -51,11 +51,11 @@ execute "tar" do
   group group
   cwd install_dir
   command "tar zxvf #{Chef::Config[:file_cache_path]}/#{tarball}"
-  not_if { ::File.exists?("#{install_dir}/#{ws_dir}") }
+  not_if { ::File.exists?("#{install_dir}/#{exec_dir}") }
 end
 
 ['logs', 'conf', 'extlib'].each do |dir|
-  directory "#{install_dir}/#{ws_dir}/#{dir}" do
+  directory "#{install_dir}/#{exec_dir}/#{dir}" do
     owner user
     group group
     mode 00755
@@ -68,29 +68,29 @@ end
 # NB you'll need to host it internally somewhere
 jdbc_jar = "mysql-connector.jar"
 
-remote_file "#{install_dir}/#{ws_dir}/extlib/#{jdbc_jar}" do
+remote_file "#{install_dir}/#{exec_dir}/extlib/#{jdbc_jar}" do
   source node[:azkaban][:jdbc_jar_url]
   mode 00644
 end
 
 # set up start and init scripts
-template "#{install_dir}/#{ws_dir}/bin/azkaban-web-start.sh" do
-  source "azkaban-web-start.sh.erb"
+template "#{install_dir}/#{exec_dir}/bin/azkaban-executor-start.sh" do
+  source "azkaban-executor-start.sh.erb"
   owner user
   group group
   mode  00755
-  variables({'ak_dir' => "#{install_dir}/#{ws_dir}"})
+  variables({'ak_dir' => "#{install_dir}/#{exec_dir}"})
 end
 
-template "#{install_dir}/#{ws_dir}/bin/azkaban-web-shutdown.sh" do
-  source "azkaban-web-shutdown.sh.erb"
+template "#{install_dir}/#{exec_dir}/bin/azkaban-executor-shutdown.sh" do
+  source "azkaban-executor-shutdown.sh.erb"
   owner user
   group group
   mode  00755
-  variables({'ak_dir' => "#{install_dir}/#{ws_dir}"})
+  variables({'ak_dir' => "#{install_dir}/#{exec_dir}"})
 end
 
-template "#{install_dir}/#{ws_dir}/conf/azkaban.properties" do
+template "#{install_dir}/#{exec_dir}/conf/azkaban.properties" do
   source "azkaban.properties.erb"
   owner user
   group group
@@ -100,18 +100,18 @@ template "#{install_dir}/#{ws_dir}/conf/azkaban.properties" do
   })
 end
 
-template "azkaban-web-init" do
-    path "/etc/init.d/azkaban-web"
-    source "azkaban-web-init-script.sh.erb"
+template "azkaban-executor-init" do
+    path "/etc/init.d/azkaban-executor"
+    source "azkaban-executor-init-script.sh.erb"
     owner "root"
     group "root"
     mode "0755"
-    notifies :restart, "service[azkaban-web]"
-    variables('ak_dir' => "#{install_dir}/#{ws_dir}")
+    notifies :restart, "service[azkaban-executor]"
+    variables({'ak_dir' => "#{install_dir}/#{exec_dir}"})
 end
 
-service "azkaban-web" do
-    pattern 'azkaban-web'
+service "azkaban-executor" do
+    pattern 'azkaban-executor'
     supports :restart => true, :start => true, :stop => true
     action [ :nothing ]
 end

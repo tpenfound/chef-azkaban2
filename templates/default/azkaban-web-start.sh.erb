@@ -1,10 +1,13 @@
-azkaban_dir=$(dirname $0)/..
-base_dir=$azkaban_dir
-tmpdir=<%= @node[:azkaban][:tmp_dir] %>
+#!/bin/bash
+
+azkaban_dir=<%= @ak_dir %>
+
+# Specifies location of azkaban.properties, log4j.properties files
+# Change if necessary
+conf=$azkaban_dir/conf
 
 if [[ -z "$tmpdir" ]]; then
-echo "temp directory must be set!"
-exit
+tmpdir=<%= @node[:azkaban][:tmp_dir] %>
 fi
 
 for file in $azkaban_dir/lib/*.jar;
@@ -17,31 +20,39 @@ do
   CLASSPATH=$CLASSPATH:$file
 done
 
-for file in $base_dir/plugins/*/*.jar;
+for file in $azkaban_dir/plugins/*/*.jar;
 do
   CLASSPATH=$CLASSPATH:$file
 done
 
-for file in $HADOOP_HOME/hadoop-core*.jar
-do
-  CLASSPATH=$CLASSPATH:$file
-done
-
-CLASSPATH=$CLASSPATH:$HADOOP_HOME/conf
-
-echo $azkaban_dir;
-echo $base_dir;
-echo $CLASSPATH;
-
-executorport=`cat conf/azkaban.properties | grep executor.port | cut -d = -f 2`
-serverpath=`pwd`
-
-if [ -z $AZKABAN_OPTS ]; then
-  AZKABAN_OPTS="-Xmx3G -server -Dcom.sun.management.jmxremote -Djava.io.tmpdir=$tmpdir -Dexecutorport=$executorport -Dserverpath=$serverpath"
+if [ "$HADOOP_HOME" != "" ]; then
+        echo "Using Hadoop from $HADOOP_HOME"
+        CLASSPATH=$CLASSPATH:$HADOOP_HOME/conf:$HADOOP_HOME/*
+        JAVA_LIB_PATH="-Djava.library.path=$HADOOP_HOME/lib/native/Linux-amd64-64"
+else
+        echo "Error: HADOOP_HOME is not set. Hadoop job types will not run properly."
 fi
 
-HADOOP_NATIVE_LIB="-Djava.library.path=$HADOOP_HOME/lib/native/Linux-amd64-64"
+if [ "$HIVE_HOME" != "" ]; then
+        echo "Using Hive from $HIVE_HOME"
+        CLASSPATH=$CLASSPATH:$HIVE_HOME/conf:$HIVE_HOME/lib/*
+fi
 
-java $AZKABAN_OPTS $HADOOP_NATIVE_LIB -cp $CLASSPATH azkaban.webapp.AzkabanWebServer -conf $base_dir/conf $@ &
+echo $azkaban_dir;
+echo $CLASSPATH;
 
-echo $! > currentpid
+executorport=`cat $conf/azkaban.properties | grep executor.port | cut -d = -f 2`
+serverpath=`pwd`
+
+if [[ -z "$AZKABAN_OPTS" ]]; then
+  AZKABAN_OPTS="-Xmx4G"
+fi
+# Set the log4j configuration file
+if [ -f $conf/log4j.properties ]; then
+  AZKABAN_OPTS="$AZKABAN_OPTS -Dlog4j.configuration=file:$conf/log4j.properties"
+fi
+AZKABAN_OPTS="$AZKABAN_OPTS -server -Dcom.sun.management.jmxremote -Djava.io.tmpdir=$tmpdir -Dexecutorport=$executorport -Dserverpath=$serverpath -Dlog4j.log.dir=$azkaban_dir/logs"
+
+java $AZKABAN_OPTS $JAVA_LIB_PATH -cp $CLASSPATH azkaban.webapp.AzkabanWebServer -conf $conf $@ &
+
+echo $! > $azkaban_dir/currentpid

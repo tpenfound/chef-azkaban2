@@ -13,7 +13,7 @@ export PATH=/usr/local/bin:$PATH
 export AZKBN_USER=<%= node[:azkaban][:executor][:user] %>
 
 if [ -z "$AZKBN_HOME" ]; then
-  AZKBN_HOME=<%= @node[:azkaban][:install_dir] %>/azkaban-executor-<%= @node[:azkaban][:version] %>/
+  AZKBN_HOME=<%= @ak_dir %>
 fi
 export AZKBN_HOME
 
@@ -25,7 +25,6 @@ export AZKBN_PIDFILE
 if [ -z "$SHUTDOWN_WAIT" ]; then
   SHUTDOWN_WAIT=10
 fi
-
 
 CMD_PREFIX=''
 

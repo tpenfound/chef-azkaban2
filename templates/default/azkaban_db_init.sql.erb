@@ -1,0 +1,8 @@
+# Example database creation command, although the db name doesn't need to be 'azkaban'
+CREATE DATABASE <%= @ak_dbname %>;
+
+# Example database creation command. The user name doesn't need to be 'azkaban'
+CREATE USER '<%= @ak_dbuser %>'@'%' IDENTIFIED BY '<%= @ak_dbpass %>';
+
+# Replace db, username with the ones created by the previous steps.
+GRANT SELECT,INSERT,UPDATE,DELETE ON <%= @ak_dbname %>.* to '<%= @ak_dbuser %>'@'%' WITH GRANT OPTION;

@@ -1,8 +1,19 @@
-#!/bin/bash
-azkaban_dir=$(dirname $0)/..
+#!/usr/bin/env bash
+# Shutdown script for azkaban web server
+set -o nounset
+source "$(dirname $0)/util.sh"
 
-proc=`cat $azkaban_dir/currentpid`
-echo "killing AzkabanWebServer"
-kill $proc
+installdir=azkaban_dir=<%= @ak_dir %>
 
-rm $azkaban_dir/currentpid
+maxattempt=3
+pid=`cat ${installdir}/currentpid`
+pname="web server"
+
+kill_process_with_retry "${pid}" "${pname}" "${maxattempt}"
+
+if [[ $? == 0 ]]; then
+  rm -f ${installdir}/currentpid
+  exit 0
+else
+  exit 1
+fi

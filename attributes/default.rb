@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # Install
-default[:azkaban][:version] = "2.5.0"
+default[:azkaban][:version] = "0.1.0-SNAPSHOT"
 default[:azkaban][:install_dir] = "/opt"
 default[:azkaban][:executor][:user] = "azkaban"
 default[:azkaban][:executor][:group] = "azkaban"
@@ -27,13 +27,11 @@ default[:azkaban][:tmp_dir] = "/tmp"
 
 default[:azkaban][:executor][:download_url] = ""
 default[:azkaban][:webserver][:download_url] = ""
+default[:azkaban][:db_init_sql][:download_url] = ""
 
 # webserver-specific
 default[:azkaban][:jetty][:ssl_port] = 8443
 default[:azkaban][:jetty][:max_threads] = 25
-
-# executor-specific
-default[:azkaban][:include_jobtype_plugin] = false
 
 # Azkaban properties
 default[:azkaban][:name] = "Local"
@@ -44,7 +42,6 @@ default[:azkaban][:timezone] = "America/Chicago"
 
 default[:azkaban][:execution_dir]="executions"
 default[:azkaban][:project_dir]="projects"
-
 
 # talk to MySQL
 default[:azkaban][:mysql][:database] = "azkaban"

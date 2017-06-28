@@ -1,11 +1,13 @@
-azkaban_dir=$(dirname $0)/..
-base_dir=$azkaban_dir
-tmpdir=<%= @node[:azkaban][:tmp_dir] %>
-export PATH=/usr/local/bin:$PATH
+#!/bin/bash
+
+azkaban_dir=<%= @ak_dir %>
+
+# Specifies location of azkaban.properties, log4j.properties files
+# Change if necessary
+conf=$azkaban_dir/conf
 
 if [[ -z "$tmpdir" ]]; then
-echo "temp directory must be set!"
-exit
+tmpdir=<%= @node[:azkaban][:tmp_dir] %>
 fi
 
 for file in $azkaban_dir/lib/*.jar;
@@ -18,32 +20,40 @@ do
   CLASSPATH=$CLASSPATH:$file
 done
 
-for file in $base_dir/plugins/*/*.jar;
+for file in $azkaban_dir/plugins/*/*.jar;
 do
   CLASSPATH=$CLASSPATH:$file
 done
 
-for file in $HADOOP_HOME/hadoop-core*.jar
-do
-  CLASSPATH=$CLASSPATH:$file
-done
+if [ "$HADOOP_HOME" != "" ]; then
+        echo "Using Hadoop from $HADOOP_HOME"
+        CLASSPATH=$CLASSPATH:$HADOOP_HOME/conf:$HADOOP_HOME/*
+        JAVA_LIB_PATH="-Djava.library.path=$HADOOP_HOME/lib/native/Linux-amd64-64"
+else
+        echo "Error: HADOOP_HOME is not set. Hadoop job types will not run properly."
+fi
 
-CLASSPATH=$CLASSPATH:$HADOOP_HOME/conf
+if [ "$HIVE_HOME" != "" ]; then
+        echo "Using Hive from $HIVE_HOME"
+        CLASSPATH=$CLASSPATH:$HIVE_HOME/conf:$HIVE_HOME/lib/*
+fi
 
 echo $azkaban_dir;
-echo $base_dir;
 echo $CLASSPATH;
 
-executorport=`cat conf/azkaban.properties | grep executor.port | cut -d = -f 2`
+executorport=`cat $conf/azkaban.properties | grep executor.port | cut -d = -f 2`
 echo "Starting AzkabanExecutorServer on port $executorport ..."
 serverpath=`pwd`
 
-if [ -z $AZKABAN_OPTS ]; then
-  AZKABAN_OPTS="-Xmx3G -server -Dcom.sun.management.jmxremote -Djava.io.tmpdir=$tmpdir -Dexecutorport=$executorport -Dserverpath=$serverpath"
+if [[ -z "$AZKABAN_OPTS" ]]; then
+  AZKABAN_OPTS="-Xmx3G"
 fi
+# Set the log4j configuration file
+if [ -f $conf/log4j.properties ]; then
+  AZKABAN_OPTS="$AZKABAN_OPTS -Dlog4j.configuration=file:$conf/log4j.properties"
+fi
+AZKABAN_OPTS="$AZKABAN_OPTS -server -Dcom.sun.management.jmxremote -Djava.io.tmpdir=$tmpdir -Dexecutorport=$executorport -Dserverpath=$serverpath -Dlog4j.log.dir=$azkaban_dir/logs"
 
-NATIVE_LIB_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native/Linux-amd64-64"
+java $AZKABAN_OPTS $JAVA_LIB_PATH -cp $CLASSPATH azkaban.execapp.AzkabanExecutorServer -conf $conf $@ &
 
-java $AZKABAN_OPTS $NATIVE_LIB_OPTS -cp $CLASSPATH azkaban.execapp.AzkabanExecutorServer -conf $base_dir/conf $@ &
-
-echo $! > currentpid
+echo $! > $azkaban_dir/currentpid
