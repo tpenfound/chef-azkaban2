@@ -44,6 +44,7 @@ default[:azkaban][:execution_dir]="executions"
 default[:azkaban][:project_dir]="projects"
 
 # talk to MySQL
+default[:azkaban][:mysql][:host] = "127.0.0.1"
 default[:azkaban][:mysql][:database] = "azkaban"
 default[:azkaban][:mysql][:user] = "azkaban"
 default[:azkaban][:mysql][:password] = "azkaban"
