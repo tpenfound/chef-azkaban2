@@ -65,14 +65,15 @@ end
 
 # download JDBC connector jar
 # NB you'll need to host it internally somewhere
-jdbc_jar = "mysql-connector.jar"
+# sorta looks like this is included in the not-packages for 3.x
+# jdbc_jar = "mysql-connector.jar"
 
-remote_file "#{install_dir}/#{exec_dir}/extlib/#{jdbc_jar}" do
-  source node[:azkaban][:jdbc_jar_url]
-  mode 00644
-end
+# remote_file "#{install_dir}/#{exec_dir}/extlib/#{jdbc_jar}" do
+#   source node[:azkaban][:jdbc_jar_url]
+#   mode 00644
+# end
 
-# set up start and init scripts
+#tweaked internal start scripts
 template "#{install_dir}/#{exec_dir}/bin/azkaban-executor-start.sh" do
   source "azkaban-executor-start.sh.erb"
   owner user
@@ -89,6 +90,7 @@ template "#{install_dir}/#{exec_dir}/bin/azkaban-executor-shutdown.sh" do
   variables({'ak_dir' => "#{install_dir}/#{exec_dir}"})
 end
 
+#config files
 template "#{install_dir}/#{exec_dir}/conf/azkaban.properties" do
   source "azkaban.properties.erb"
   owner user
@@ -99,6 +101,31 @@ template "#{install_dir}/#{exec_dir}/conf/azkaban.properties" do
   })
 end
 
+cookbook_file "#{install_dir}/#{exec_dir}/conf/log4j.properties" do
+  source 'log4j.properties'
+  owner user
+  group group
+  mode  00755
+  action :create
+end
+
+cookbook_file "#{install_dir}/#{exec_dir}/conf/global.properties" do
+  source 'global.properties'
+  owner user
+  group group
+  mode  00755
+  action :create
+end
+
+cookbook_file "#{install_dir}/#{exec_dir}/conf/azkaban-users.xml" do
+  source 'azkaban-users.xml'
+  owner user
+  group group
+  mode  00755
+  action :create
+end
+
+#init scripts
 template "azkaban-executor-init" do
     path "/etc/init.d/azkaban-executor"
     source "azkaban-executor-init-script.sh.erb"

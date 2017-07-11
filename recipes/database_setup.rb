@@ -57,9 +57,9 @@ end
 
 bash 'do_azkaban_db_init' do
   code <<-EOH
-    mysql -h localhost -u root -p#{node['mysql']['server_root_password']} < #{node[:azkaban][:install_dir]}/azkaban_misc/azkaban_db_init.sql
+    mysql -h 127.0.0.1 -u root --password=#{node['mysql']['initial_root_password']} < #{node[:azkaban][:install_dir]}/azkaban_misc/azkaban_db_init.sql
     tar -zxvf azkaban-db.tar.gz
-    mysql -h localhost -u root -p#{node['mysql']['server_root_password']} --database=#{node[:azkaban][:mysql][:database]} < #{node[:azkaban][:install_dir]}/azkaban_misc/azkaban-db-0.1.0-SNAPSHOT/create-all-sql-0.1.0-SNAPSHOT.sql
+    mysql -h 127.0.0.1 -u root --password=#{node['mysql']['initial_root_password']} --database=#{node[:azkaban][:mysql][:database]} < #{node[:azkaban][:install_dir]}/azkaban_misc/azkaban-db-0.1.0-SNAPSHOT/create-all-sql-0.1.0-SNAPSHOT.sql
 
     touch .db_inited
   EOH

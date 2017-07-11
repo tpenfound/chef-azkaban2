@@ -2,6 +2,7 @@
 azkaban.name=<%= @node[:azkaban][:name] %>
 azkaban.label=<%= @node[:azkaban][:label] %>
 azkaban.color=<%= @node[:azkaban][:color] %>
+azkaban.default.servlet.path=/index
 web.resource.dir=web/
 default.timezone.id=<%= @node[:azkaban][:timezone] %>
 
@@ -26,6 +27,7 @@ mysql.numconnections=100
 velocity.dev.mode=false
 
 # Azkaban Jetty server properties. Ignored in tomcat
+jetty.use.ssl=true
 jetty.maxThreads=<%= @node[:azkaban][:jetty][:max_threads] %>
 jetty.ssl.port=<%= @node[:azkaban][:jetty][:ssl_port] %>
 jetty.port=8081

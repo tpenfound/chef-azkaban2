@@ -48,9 +48,9 @@ start()
     read ppid < $AZKBN_PIDFILE
     if [ `ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null` -eq '1' ]; then
       echo -n "$PROG is already running"
-      failure
-      echo
-      return 1
+      #failure
+      #echo
+      return 0
     else
       rm -f $AZKBN_PIDFILE
     fi
